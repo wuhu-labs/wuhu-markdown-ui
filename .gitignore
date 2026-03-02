@@ -1,0 +1,14 @@
+# Xcode
+*.xcodeproj/
+!Demo/WuhuDocViewDemo.xcodeproj/
+xcuserdata/
+DerivedData/
+*.xcworkspace/
+
+# SPM
+.build/
+.swiftpm/
+Package.resolved
+
+# OS
+.DS_Store

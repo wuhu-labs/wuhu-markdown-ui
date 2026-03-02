@@ -1,0 +1,436 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		15993EEBA33A8C504E7E6381 /* WuhuDocView in Frameworks */ = {isa = PBXBuildFile; productRef = 8D48CA527A6EAF081014B656 /* WuhuDocView */; };
+		41BE4890B461135575F7C4DE /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E548EE2C6216334EFF8EA3CC /* SampleData.swift */; };
+		79CE21C298A9472F2D097060 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0754B472F0D450D9BA332D9E /* DemoApp.swift */; };
+		A0C208C110B05763A60BCE43 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E548EE2C6216334EFF8EA3CC /* SampleData.swift */; };
+		D12DBC948789B6E5E72AFB79 /* WuhuDocView in Frameworks */ = {isa = PBXBuildFile; productRef = 1C6FF5ACC20A66D9E8AEFF50 /* WuhuDocView */; };
+		F45B4959EF8A4D7FA8DAA650 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0754B472F0D450D9BA332D9E /* DemoApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0754B472F0D450D9BA332D9E /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
+		38D2D513007852414A8A32C6 /* WuhuDocViewDemoiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = WuhuDocViewDemoiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		702E36DFB65B9A59C97E4437 /* WuhuDocViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WuhuDocViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E548EE2C6216334EFF8EA3CC /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		E79B573E6E403D4A130CD96A /* WuhuDocView */ = {isa = PBXFileReference; lastKnownFileType = folder; name = WuhuDocView; path = ..; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9AFD6739AF57837781972FA3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				15993EEBA33A8C504E7E6381 /* WuhuDocView in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D616391C00C9EBA852E92724 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D12DBC948789B6E5E72AFB79 /* WuhuDocView in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0DCDA1BA640EA9E25E768DF7 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				0754B472F0D450D9BA332D9E /* DemoApp.swift */,
+				E548EE2C6216334EFF8EA3CC /* SampleData.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		41FFC9C2F70118E1FD190358 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				702E36DFB65B9A59C97E4437 /* WuhuDocViewDemo.app */,
+				38D2D513007852414A8A32C6 /* WuhuDocViewDemoiOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66772159CB748C9F40B96E83 = {
+			isa = PBXGroup;
+			children = (
+				7ED96FB3CEB0A3850B8CC520 /* Packages */,
+				0DCDA1BA640EA9E25E768DF7 /* Sources */,
+				41FFC9C2F70118E1FD190358 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7ED96FB3CEB0A3850B8CC520 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				E79B573E6E403D4A130CD96A /* WuhuDocView */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		36D32C3B3943F3ACFB0942CA /* WuhuDocViewDemoiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7BE56A77FFE1D5CB0D86504 /* Build configuration list for PBXNativeTarget "WuhuDocViewDemoiOS" */;
+			buildPhases = (
+				73C3CE24E441B162CC203D55 /* Sources */,
+				D616391C00C9EBA852E92724 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WuhuDocViewDemoiOS;
+			packageProductDependencies = (
+				1C6FF5ACC20A66D9E8AEFF50 /* WuhuDocView */,
+			);
+			productName = WuhuDocViewDemoiOS;
+			productReference = 38D2D513007852414A8A32C6 /* WuhuDocViewDemoiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8E1CBC0DCB56E32BB1BEBEF7 /* WuhuDocViewDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 75B09C5E9C483C1A5D5B2863 /* Build configuration list for PBXNativeTarget "WuhuDocViewDemo" */;
+			buildPhases = (
+				8DB78C2C6525A948C59B6F91 /* Sources */,
+				9AFD6739AF57837781972FA3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WuhuDocViewDemo;
+			packageProductDependencies = (
+				8D48CA527A6EAF081014B656 /* WuhuDocView */,
+			);
+			productName = WuhuDocViewDemo;
+			productReference = 702E36DFB65B9A59C97E4437 /* WuhuDocViewDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D65BF47CA12520155A69C766 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					36D32C3B3943F3ACFB0942CA = {
+						DevelopmentTeam = 97W7A3Y9GD;
+						ProvisioningStyle = Automatic;
+					};
+					8E1CBC0DCB56E32BB1BEBEF7 = {
+						DevelopmentTeam = 97W7A3Y9GD;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 10E61AA9E476CAEB1F3E214E /* Build configuration list for PBXProject "WuhuDocViewDemo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 66772159CB748C9F40B96E83;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				01C987FA4EA3F6AEC30A03A4 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8E1CBC0DCB56E32BB1BEBEF7 /* WuhuDocViewDemo */,
+				36D32C3B3943F3ACFB0942CA /* WuhuDocViewDemoiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		73C3CE24E441B162CC203D55 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F45B4959EF8A4D7FA8DAA650 /* DemoApp.swift in Sources */,
+				41BE4890B461135575F7C4DE /* SampleData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DB78C2C6525A948C59B6F91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79CE21C298A9472F2D097060 /* DemoApp.swift in Sources */,
+				A0C208C110B05763A60BCE43 /* SampleData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		17D577FD8EFF6CD9975512AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMainStoryboardFile = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ms.liu.wuhu.docview-demo";
+				PRODUCT_NAME = WuhuDocViewDemo;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		5351244F77C74F6D4F27D00D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ms.liu.wuhu.docview-demo.ios";
+				PRODUCT_NAME = WuhuDocViewDemo;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8532BF43850FEBA29F2994A1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "ms.liu.wuhu.docview-demo.ios";
+				PRODUCT_NAME = WuhuDocViewDemo;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9C233846498F9C9FFD85E971 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 97W7A3Y9GD;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9E1E5D21FCDA42D96EFDC44B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 97W7A3Y9GD;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FD2830B25DF6E064264916B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMainStoryboardFile = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "ms.liu.wuhu.docview-demo";
+				PRODUCT_NAME = WuhuDocViewDemo;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10E61AA9E476CAEB1F3E214E /* Build configuration list for PBXProject "WuhuDocViewDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C233846498F9C9FFD85E971 /* Debug */,
+				9E1E5D21FCDA42D96EFDC44B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		75B09C5E9C483C1A5D5B2863 /* Build configuration list for PBXNativeTarget "WuhuDocViewDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17D577FD8EFF6CD9975512AA /* Debug */,
+				FD2830B25DF6E064264916B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A7BE56A77FFE1D5CB0D86504 /* Build configuration list for PBXNativeTarget "WuhuDocViewDemoiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8532BF43850FEBA29F2994A1 /* Debug */,
+				5351244F77C74F6D4F27D00D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		01C987FA4EA3F6AEC30A03A4 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1C6FF5ACC20A66D9E8AEFF50 /* WuhuDocView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WuhuDocView;
+		};
+		8D48CA527A6EAF081014B656 /* WuhuDocView */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WuhuDocView;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D65BF47CA12520155A69C766 /* Project object */;
+}

@@ -1,0 +1,49 @@
+name: WuhuDocViewDemo
+
+options:
+  createIntermediateGroups: true
+
+settings:
+  base:
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 97W7A3Y9GD
+
+packages:
+  WuhuDocView:
+    path: ..
+
+targets:
+  WuhuDocViewDemo:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_NAME: WuhuDocViewDemo
+        PRODUCT_BUNDLE_IDENTIFIER: ms.liu.wuhu.docview-demo
+        MACOSX_DEPLOYMENT_TARGET: "15.0"
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_NSMainStoryboardFile: ""
+    dependencies:
+      - package: WuhuDocView
+        product: WuhuDocView
+
+  WuhuDocViewDemoiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_NAME: WuhuDocViewDemo
+        PRODUCT_BUNDLE_IDENTIFIER: ms.liu.wuhu.docview-demo.ios
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    dependencies:
+      - package: WuhuDocView
+        product: WuhuDocView
