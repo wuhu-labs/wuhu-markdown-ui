@@ -1,14 +1,17 @@
 # Xcode
 *.xcodeproj/
-!Demo/WuhuDocViewDemo.xcodeproj/
+*.xcworkspace/
 xcuserdata/
 DerivedData/
-*.xcworkspace/
 
 # SPM
 .build/
 .swiftpm/
 Package.resolved
+
+# Tuist
+Tuist/.build/
+Derived/
 
 # OS
 .DS_Store
