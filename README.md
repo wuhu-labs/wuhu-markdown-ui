@@ -9,7 +9,7 @@ Replaces `LazyVStack` + [MarkdownUI](https://github.com/gonzalezreal/swift-markd
 Every piece of content — markdown paragraphs, headings, code blocks, tables, message headers, tool calls — is a **block** in a flat IR. The collection view renders one cell per block.
 
 ```
-Markdown AST ��� Flattener → [FlatBlock] → DocViewLayout → Collection View
+Markdown AST → Flattener → [FlatBlock] → DocViewLayout → Collection View
 ```
 
 - **Text blocks** (paragraphs, headings, list items, blockquotes) → Core Text via `CALayer.draw(in:)`. GPU-cached bitmap, zero CPU during scroll.
