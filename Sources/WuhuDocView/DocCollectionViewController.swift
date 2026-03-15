@@ -8,6 +8,13 @@ public final class DocCollectionViewController: NSViewController {
 
     private(set) var document: Document = Document(sections: [])
 
+    /// Optional external factory for custom block views. When set, this is
+    /// tried first for `.custom` blocks; returning `nil` falls back to the
+    /// built-in views (docHeader, messageHeader, toolCall, etc.).
+    public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)? {
+        didSet { syncCustomBlockView() }
+    }
+
     private lazy var scrollView: NSScrollView = {
         let sv = NSScrollView()
         sv.hasVerticalScroller = true; sv.hasHorizontalScroller = false
@@ -53,6 +60,14 @@ public final class DocCollectionViewController: NSViewController {
         dataSource = NSCollectionViewDiffableDataSource<String, BlockID>(
             collectionView: collectionView
         ) { [weak self] cv, ip, _ in self?.makeItem(cv: cv, indexPath: ip) ?? NSCollectionViewItem() }
+
+        syncCustomBlockView()
+    }
+
+    private func syncCustomBlockView() {
+        docLayout.registry.customMeasurer = CustomBlockMeasurer(
+            customBlockView: customBlockView
+        )
     }
 
     public func setDocument(_ doc: Document) {
@@ -105,6 +120,13 @@ public final class DocCollectionViewController: UIViewController {
 
     private(set) var document: Document = Document(sections: [])
 
+    /// Optional external factory for custom block views. When set, this is
+    /// tried first for `.custom` blocks; returning `nil` falls back to the
+    /// built-in views (docHeader, messageHeader, toolCall, etc.).
+    public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)? {
+        didSet { syncCustomBlockView() }
+    }
+
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: docLayout)
         cv.backgroundColor = .systemBackground
@@ -136,6 +158,14 @@ public final class DocCollectionViewController: UIViewController {
         dataSource = UICollectionViewDiffableDataSource<String, BlockID>(
             collectionView: collectionView
         ) { [weak self] cv, ip, _ in self?.makeCell(cv: cv, indexPath: ip) ?? UICollectionViewCell() }
+
+        syncCustomBlockView()
+    }
+
+    private func syncCustomBlockView() {
+        docLayout.registry.customMeasurer = CustomBlockMeasurer(
+            customBlockView: customBlockView
+        )
     }
 
     public func setDocument(_ doc: Document) {
