@@ -75,7 +75,7 @@ public final class DocCollectionViewController: NSViewController {
         switch block.content {
         case .text:
             let item = cv.makeItem(withIdentifier: TextBlockCell.identifier, for: indexPath) as! TextBlockCell
-            item.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes)
+            item.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes, indentWidth: docLayout.registry.indentWidth)
             return item
 
         case .codeBlock(let code):
@@ -158,7 +158,7 @@ public final class DocCollectionViewController: UIViewController {
         switch block.content {
         case .text:
             let cell = cv.dequeueReusableCell(withReuseIdentifier: TextBlockCell.reuseIdentifier, for: indexPath) as! TextBlockCell
-            cell.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes)
+            cell.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes, indentWidth: docLayout.registry.indentWidth)
             return cell
 
         case .codeBlock(let code):
