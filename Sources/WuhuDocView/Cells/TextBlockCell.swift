@@ -13,6 +13,40 @@ func makeCTFrame(attrString: NSAttributedString, size: CGSize) -> CTFrame? {
     )
 }
 
+/// Hit-test a `CTFrame` to find the string index at a given point.
+///
+/// `point` is in the CTFrame's coordinate system (origin bottom-left).
+/// Returns the string index, or `nil` if the point is outside all lines.
+private func characterIndex(in ctFrame: CTFrame, at point: CGPoint) -> CFIndex? {
+    let lines = CTFrameGetLines(ctFrame) as! [CTLine]
+    guard !lines.isEmpty else { return nil }
+
+    var origins = [CGPoint](repeating: .zero, count: lines.count)
+    CTFrameGetLineOrigins(ctFrame, CFRange(location: 0, length: 0), &origins)
+
+    for (i, line) in lines.enumerated() {
+        let origin = origins[i]
+        var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
+        let width = CGFloat(CTLineGetTypographicBounds(line, &ascent, &descent, &leading))
+        let lineRect = CGRect(
+            x: origin.x,
+            y: origin.y - descent,
+            width: width,
+            height: ascent + descent + leading
+        )
+        guard lineRect.contains(point) else { continue }
+        let localX = point.x - origin.x
+        return CTLineGetStringIndexForPosition(line, CGPoint(x: localX, y: 0))
+    }
+    return nil
+}
+
+/// Extract the URL from an `NSAttributedString` at the given index, if any.
+private func linkURL(in attrString: NSAttributedString, at index: CFIndex) -> URL? {
+    guard index >= 0, index < attrString.length else { return nil }
+    return attrString.attribute(.link, at: index, effectiveRange: nil) as? URL
+}
+
 // MARK: - macOS
 
 #if canImport(AppKit)
@@ -26,6 +60,10 @@ public final class TextBlockCell: NSCollectionViewItem {
     private var currentAttrString: NSAttributedString?
     private var currentBlock: FlatBlock?
     private var indentWidth: CGFloat = 24
+    private var trackingArea: NSTrackingArea?
+
+    /// Called when the user clicks a link.
+    public var onOpenURL: ((URL) -> Void)?
 
     public override func loadView() { self.view = LayerHostView() }
 
@@ -49,6 +87,8 @@ public final class TextBlockCell: NSCollectionViewItem {
         decorationLayer?.reset()
         currentAttrString = nil
         currentBlock = nil
+        onOpenURL = nil
+        NSCursor.arrow.set()
     }
 
     public override func viewDidLayout() {
@@ -68,6 +108,65 @@ public final class TextBlockCell: NSCollectionViewItem {
 
         // Decoration layer
         layoutDecoration()
+
+        // Update tracking area for cursor changes
+        updateTrackingArea()
+    }
+
+    // MARK: - Link Hit Testing
+
+    /// Convert a view-space point to CTFrame coordinate space (bottom-up).
+    private func ctFramePoint(from viewPoint: CGPoint) -> CGPoint {
+        CGPoint(x: viewPoint.x, y: view.bounds.height - viewPoint.y)
+    }
+
+    private func linkAtPoint(_ viewPoint: CGPoint) -> URL? {
+        guard let ctFrame = drawingLayer?.ctFrame,
+              let attrString = currentAttrString
+        else { return nil }
+        let pt = ctFramePoint(from: viewPoint)
+        guard let index = characterIndex(in: ctFrame, at: pt) else { return nil }
+        return linkURL(in: attrString, at: index)
+    }
+
+    // MARK: - Mouse Events
+
+    public override func mouseDown(with event: NSEvent) {
+        let point = view.convert(event.locationInWindow, from: nil)
+        if let url = linkAtPoint(point) {
+            onOpenURL?(url)
+        } else {
+            super.mouseDown(with: event)
+        }
+    }
+
+    public override func mouseMoved(with event: NSEvent) {
+        let point = view.convert(event.locationInWindow, from: nil)
+        if linkAtPoint(point) != nil {
+            NSCursor.pointingHand.set()
+        } else {
+            NSCursor.arrow.set()
+        }
+    }
+
+    // MARK: - Tracking Area
+
+    private func updateTrackingArea() {
+        if let existing = trackingArea {
+            view.removeTrackingArea(existing)
+        }
+        let ta = NSTrackingArea(
+            rect: view.bounds,
+            options: [.mouseMoved, .activeInKeyWindow, .mouseEnteredAndExited],
+            owner: self,
+            userInfo: nil
+        )
+        view.addTrackingArea(ta)
+        trackingArea = ta
+    }
+
+    public override func mouseExited(with event: NSEvent) {
+        NSCursor.arrow.set()
     }
 
     // MARK: - Decoration
@@ -125,6 +224,10 @@ public final class TextBlockCell: UICollectionViewCell {
     private var currentAttrString: NSAttributedString?
     private var currentBlock: FlatBlock?
     private var indentWidth: CGFloat = 24
+    private var tapRecognizer: UITapGestureRecognizer?
+
+    /// Called when the user taps a link.
+    public var onOpenURL: ((URL) -> Void)?
 
     public func configure(
         with block: FlatBlock,
@@ -138,6 +241,7 @@ public final class TextBlockCell: UICollectionViewCell {
         currentBlock = block
         self.indentWidth = indentWidth
         setNeedsLayout()
+        ensureTapRecognizer()
     }
 
     public override func prepareForReuse() {
@@ -146,6 +250,7 @@ public final class TextBlockCell: UICollectionViewCell {
         decorationLayer?.reset()
         currentAttrString = nil
         currentBlock = nil
+        onOpenURL = nil
     }
 
     public override func layoutSubviews() {
@@ -165,6 +270,38 @@ public final class TextBlockCell: UICollectionViewCell {
 
         // Decoration layer
         layoutDecoration()
+    }
+
+    // MARK: - Link Hit Testing
+
+    /// Convert a view-space point to CTFrame coordinate space (bottom-up).
+    private func ctFramePoint(from viewPoint: CGPoint) -> CGPoint {
+        CGPoint(x: viewPoint.x, y: contentView.bounds.height - viewPoint.y)
+    }
+
+    private func linkAtPoint(_ viewPoint: CGPoint) -> URL? {
+        guard let ctFrame = drawingLayer?.ctFrame,
+              let attrString = currentAttrString
+        else { return nil }
+        let pt = ctFramePoint(from: viewPoint)
+        guard let index = characterIndex(in: ctFrame, at: pt) else { return nil }
+        return linkURL(in: attrString, at: index)
+    }
+
+    // MARK: - Tap Handling
+
+    private func ensureTapRecognizer() {
+        guard tapRecognizer == nil else { return }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        contentView.addGestureRecognizer(tap)
+        tapRecognizer = tap
+    }
+
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: contentView)
+        if let url = linkAtPoint(point) {
+            onOpenURL?(url)
+        }
     }
 
     // MARK: - Decoration

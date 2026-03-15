@@ -15,6 +15,9 @@ public final class DocCollectionViewController: NSViewController {
         didSet { syncCustomBlockView() }
     }
 
+    /// Called when the user clicks a link in a text block.
+    public var onOpenURL: ((URL) -> Void)?
+
     private lazy var scrollView: NSScrollView = {
         let sv = NSScrollView()
         sv.hasVerticalScroller = true; sv.hasHorizontalScroller = false
@@ -91,6 +94,7 @@ public final class DocCollectionViewController: NSViewController {
         case .text:
             let item = cv.makeItem(withIdentifier: TextBlockCell.identifier, for: indexPath) as! TextBlockCell
             item.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes, indentWidth: docLayout.registry.indentWidth)
+            item.onOpenURL = onOpenURL
             return item
 
         case .codeBlock(let code):
@@ -126,6 +130,9 @@ public final class DocCollectionViewController: UIViewController {
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)? {
         didSet { syncCustomBlockView() }
     }
+
+    /// Called when the user taps a link in a text block.
+    public var onOpenURL: ((URL) -> Void)?
 
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: docLayout)
@@ -189,6 +196,7 @@ public final class DocCollectionViewController: UIViewController {
         case .text:
             let cell = cv.dequeueReusableCell(withReuseIdentifier: TextBlockCell.reuseIdentifier, for: indexPath) as! TextBlockCell
             cell.configure(with: block, resolvedAttributes: docLayout.resolvedAttributes, indentWidth: docLayout.registry.indentWidth)
+            cell.onOpenURL = onOpenURL
             return cell
 
         case .codeBlock(let code):

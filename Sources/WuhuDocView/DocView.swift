@@ -25,6 +25,8 @@ public struct DocView: NSViewControllerRepresentable {
     public var document: Document
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
 
+    @Environment(\.openURL) private var openURL
+
     public init(
         document: Document,
         customBlockView: (@MainActor (FlatBlock) -> AnyView?)? = nil
@@ -36,6 +38,7 @@ public struct DocView: NSViewControllerRepresentable {
     public func makeNSViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
+        controller.onOpenURL = { openURL($0) }
         return controller
     }
 
@@ -44,6 +47,7 @@ public struct DocView: NSViewControllerRepresentable {
         context: Context
     ) {
         controller.customBlockView = customBlockView
+        controller.onOpenURL = { [openURL] in openURL($0) }
         controller.setDocument(document)
     }
 }
@@ -54,6 +58,8 @@ import UIKit
 public struct DocView: UIViewControllerRepresentable {
     public var document: Document
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
+
+    @Environment(\.openURL) private var openURL
 
     public init(
         document: Document,
@@ -66,6 +72,7 @@ public struct DocView: UIViewControllerRepresentable {
     public func makeUIViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
+        controller.onOpenURL = { openURL($0) }
         return controller
     }
 
@@ -74,6 +81,7 @@ public struct DocView: UIViewControllerRepresentable {
         context: Context
     ) {
         controller.customBlockView = customBlockView
+        controller.onOpenURL = { [openURL] in openURL($0) }
         controller.setDocument(document)
     }
 }
