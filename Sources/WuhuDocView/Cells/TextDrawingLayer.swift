@@ -30,7 +30,9 @@ final class TextDrawingLayer: CALayer {
     /// macOS = true (layer context is bottom-up), iOS = false (already top-down).
     var needsFlip: Bool = true
 
-    override init() { super.init() }
+    override init() {
+        super.init()
+    }
 
     override init(layer: Any) {
         super.init(layer: layer)
@@ -45,12 +47,25 @@ final class TextDrawingLayer: CALayer {
     required init?(coder: NSCoder) { fatalError() }
 
     /// Clear rendering state. Called by the cell's `prepareForReuse`.
-    /// Does NOT clear `contents` — the stale bitmap stays visible until
-    /// the next `setNeedsDisplay()` replaces it. This avoids a white flash
-    /// between reuse and configure.
+    /// Clear `contents` too so a reused cell never shows stale text while
+    /// waiting for the next configure/draw cycle.
     func reset() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         ctFrame = nil
         block = nil
+        contents = nil
+        CATransaction.commit()
+    }
+
+    override func action(forKey event: String) -> CAAction? {
+        switch event {
+        case "contents", "contentsScale":
+            // Text redraws should swap in immediately with no implicit fade.
+            NSNull()
+        default:
+            super.action(forKey: event)
+        }
     }
 
     // MARK: - Drawing
