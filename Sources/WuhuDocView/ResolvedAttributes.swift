@@ -47,6 +47,15 @@ public struct ResolvedAttributes: @unchecked Sendable {
             .foregroundColor(textColor)
         styled.mergeAttributes(container, mergePolicy: .keepCurrent)
 
+        // Style link runs: underline + accent color.
+        for run in styled.runs {
+            guard run.link != nil else { continue }
+            let linkStyle = AttributeContainer
+                .foregroundColor(PlatformColor.linkColor)
+                .underlineStyle(.single)
+            styled[run.range].mergeAttributes(linkStyle, mergePolicy: .keepNew)
+        }
+
         return NSAttributedString(styled)
     }
 
@@ -66,4 +75,9 @@ extension NSColor {
 #elseif canImport(UIKit)
 public typealias PlatformFont = UIFont
 public typealias PlatformColor = UIColor
+
+extension UIColor {
+    /// Alias so `.linkColor` works on iOS like AppKit.
+    static var linkColor: UIColor { .link }
+}
 #endif
