@@ -22,55 +22,92 @@ public final class TextBlockCell: NSCollectionViewItem {
     public static let identifier = NSUserInterfaceItemIdentifier("TextBlockCell")
 
     private var drawingLayer: TextDrawingLayer?
+    private var decorationLayer: DecorationLayer?
     private var currentAttrString: NSAttributedString?
     private var currentBlock: FlatBlock?
+    private var indentWidth: CGFloat = 24
 
     public override func loadView() { self.view = LayerHostView() }
 
-    public func configure(with block: FlatBlock, resolvedAttributes: ResolvedAttributes) {
+    public func configure(
+        with block: FlatBlock,
+        resolvedAttributes: ResolvedAttributes,
+        indentWidth: CGFloat = 24
+    ) {
         guard case .text(let inline) = block.content else { return }
-        let attrStr = resolvedAttributes.applyStyle(to: inline.attributedString, kind: block.kind)
-
-        currentAttrString = attrStr
+        currentAttrString = resolvedAttributes.applyStyle(
+            to: inline.attributedString, kind: block.kind
+        )
         currentBlock = block
-
-        let layer = ensureDrawingLayer()
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        layer.frame = view.bounds
-        layer.contentsScale = view.window?.backingScaleFactor ?? 2.0
-        layer.needsFlip = true
-        layer.block = block
-        layer.ctFrame = makeCTFrame(attrString: attrStr, size: view.bounds.size)
-        layer.setNeedsDisplay()
-        CATransaction.commit()
+        self.indentWidth = indentWidth
+        view.needsLayout = true
     }
 
     public override func prepareForReuse() {
         super.prepareForReuse()
         drawingLayer?.reset()
+        decorationLayer?.reset()
         currentAttrString = nil
         currentBlock = nil
     }
 
     public override func viewDidLayout() {
         super.viewDidLayout()
-        guard let dl = drawingLayer, dl.frame.size != view.bounds.size else { return }
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        dl.frame = view.bounds
-        if let attrStr = currentAttrString {
-            dl.ctFrame = makeCTFrame(attrString: attrStr, size: view.bounds.size)
+        guard let attrStr = currentAttrString else { return }
+        let bounds = view.bounds
+
+        // Text layer
+        let dl = ensureDrawingLayer()
+        withNoAnimation {
+            dl.frame = bounds
+            dl.contentsScale = view.window?.backingScaleFactor ?? 2.0
+            dl.needsFlip = true
+            dl.ctFrame = makeCTFrame(attrString: attrStr, size: bounds.size)
+            dl.setNeedsDisplay()
         }
-        dl.setNeedsDisplay()
-        CATransaction.commit()
+
+        // Decoration layer
+        layoutDecoration()
     }
+
+    // MARK: - Decoration
+
+    private func layoutDecoration() {
+        guard let block = currentBlock, let decoration = block.decoration else {
+            decorationLayer?.isHidden = true
+            return
+        }
+
+        let dl = ensureDecorationLayer()
+        let gutterWidth = indentWidth
+        withNoAnimation {
+            dl.isHidden = false
+            dl.frame = CGRect(
+                x: -gutterWidth, y: 0,
+                width: gutterWidth, height: view.bounds.height
+            )
+            dl.contentsScale = view.window?.backingScaleFactor ?? 2.0
+            dl.decoration = decoration
+            dl.firstLineHeight = 14
+            dl.setNeedsDisplay()
+        }
+    }
+
+    // MARK: - Layer Management
 
     private func ensureDrawingLayer() -> TextDrawingLayer {
         if let existing = drawingLayer { return existing }
         let l = TextDrawingLayer()
         view.layer?.addSublayer(l)
         drawingLayer = l
+        return l
+    }
+
+    private func ensureDecorationLayer() -> DecorationLayer {
+        if let existing = decorationLayer { return existing }
+        let l = DecorationLayer()
+        view.layer?.addSublayer(l)
+        decorationLayer = l
         return l
     }
 }
@@ -84,47 +121,76 @@ public final class TextBlockCell: UICollectionViewCell {
     public static let reuseIdentifier = "TextBlockCell"
 
     private var drawingLayer: TextDrawingLayer?
+    private var decorationLayer: DecorationLayer?
     private var currentAttrString: NSAttributedString?
     private var currentBlock: FlatBlock?
+    private var indentWidth: CGFloat = 24
 
-    public func configure(with block: FlatBlock, resolvedAttributes: ResolvedAttributes) {
+    public func configure(
+        with block: FlatBlock,
+        resolvedAttributes: ResolvedAttributes,
+        indentWidth: CGFloat = 24
+    ) {
         guard case .text(let inline) = block.content else { return }
-        let attrStr = resolvedAttributes.applyStyle(to: inline.attributedString, kind: block.kind)
-
-        currentAttrString = attrStr
+        currentAttrString = resolvedAttributes.applyStyle(
+            to: inline.attributedString, kind: block.kind
+        )
         currentBlock = block
-
-        let layer = ensureDrawingLayer()
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        layer.frame = contentView.bounds
-        layer.contentsScale = UIScreen.main.scale
-        layer.needsFlip = false
-        layer.block = block
-        layer.ctFrame = makeCTFrame(attrString: attrStr, size: contentView.bounds.size)
-        layer.setNeedsDisplay()
-        CATransaction.commit()
+        self.indentWidth = indentWidth
+        setNeedsLayout()
     }
 
     public override func prepareForReuse() {
         super.prepareForReuse()
         drawingLayer?.reset()
+        decorationLayer?.reset()
         currentAttrString = nil
         currentBlock = nil
     }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        guard let dl = drawingLayer, dl.frame.size != contentView.bounds.size else { return }
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        dl.frame = contentView.bounds
-        if let attrStr = currentAttrString {
-            dl.ctFrame = makeCTFrame(attrString: attrStr, size: contentView.bounds.size)
+        guard let attrStr = currentAttrString else { return }
+        let bounds = contentView.bounds
+
+        // Text layer
+        let dl = ensureDrawingLayer()
+        withNoAnimation {
+            dl.frame = bounds
+            dl.contentsScale = UIScreen.main.scale
+            dl.needsFlip = false
+            dl.ctFrame = makeCTFrame(attrString: attrStr, size: bounds.size)
+            dl.setNeedsDisplay()
         }
-        dl.setNeedsDisplay()
-        CATransaction.commit()
+
+        // Decoration layer
+        layoutDecoration()
     }
+
+    // MARK: - Decoration
+
+    private func layoutDecoration() {
+        guard let block = currentBlock, let decoration = block.decoration else {
+            decorationLayer?.isHidden = true
+            return
+        }
+
+        let dl = ensureDecorationLayer()
+        let gutterWidth = indentWidth
+        withNoAnimation {
+            dl.isHidden = false
+            dl.frame = CGRect(
+                x: -gutterWidth, y: 0,
+                width: gutterWidth, height: contentView.bounds.height
+            )
+            dl.contentsScale = UIScreen.main.scale
+            dl.decoration = decoration
+            dl.firstLineHeight = 14
+            dl.setNeedsDisplay()
+        }
+    }
+
+    // MARK: - Layer Management
 
     private func ensureDrawingLayer() -> TextDrawingLayer {
         if let existing = drawingLayer { return existing }
@@ -132,6 +198,14 @@ public final class TextBlockCell: UICollectionViewCell {
         l.needsFlip = false
         contentView.layer.addSublayer(l)
         drawingLayer = l
+        return l
+    }
+
+    private func ensureDecorationLayer() -> DecorationLayer {
+        if let existing = decorationLayer { return existing }
+        let l = DecorationLayer()
+        contentView.layer.addSublayer(l)
+        decorationLayer = l
         return l
     }
 }
