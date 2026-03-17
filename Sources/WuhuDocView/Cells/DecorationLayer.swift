@@ -55,8 +55,20 @@ final class DecorationLayer: CALayer {
     override func draw(in ctx: CGContext) {
         guard let decoration else { return }
 
-        // All drawing in top-down coordinates (layer is geometry-flipped on
-        // macOS via LayerHostView, and UIKit is naturally top-down).
+        // Normalise to top-down coordinates. iOS CALayer contexts are already
+        // top-down, but macOS contexts are bottom-up regardless of
+        // isGeometryFlipped on a parent layer.
+        #if canImport(AppKit)
+        ctx.saveGState()
+        ctx.translateBy(x: 0, y: bounds.height)
+        ctx.scaleBy(x: 1, y: -1)
+        #endif
+        defer {
+            #if canImport(AppKit)
+            ctx.restoreGState()
+            #endif
+        }
+
         let midX = bounds.width / 2
         let firstLineY = firstLineHeight
 
@@ -83,7 +95,7 @@ final class DecorationLayer: CALayer {
             let x = midX - lineWidth / 2
             ctx.saveGState()
             ctx.textMatrix = .identity
-            // CTLineDraw needs bottom-up; flip from our top-down context
+            // CTLineDraw expects bottom-up; flip from our normalised top-down context
             ctx.translateBy(x: 0, y: bounds.height)
             ctx.scaleBy(x: 1, y: -1)
             ctx.textPosition = CGPoint(x: x, y: bounds.height - firstLineY)

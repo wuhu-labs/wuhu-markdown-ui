@@ -7,6 +7,12 @@ public enum ScrollTracking: Sendable {
     case trackTail  // auto-scroll to bottom when content grows
 }
 
+/// Where the scroll view should start when first appearing.
+public enum InitialScrollPosition: Sendable {
+    case top     // default — content starts at the top
+    case bottom  // start scrolled to the bottom (e.g. chat views)
+}
+
 // MARK: - Content Diffing
 
 /// Compares two documents and returns the `BlockID`s of blocks whose content
@@ -73,8 +79,12 @@ public final class DocCollectionViewController: NSViewController {
         }
     }
 
+    /// Where to scroll when the first non-empty document is set.
+    public var initialScrollPosition: InitialScrollPosition = .top
+
     private var isUserScrolledAway: Bool = false
     private var previousContentHeight: CGFloat = 0
+    private var hasAppliedInitialScroll: Bool = false
     private nonisolated(unsafe) var scrollObserver: NSObjectProtocol?
 
     private lazy var scrollView: NSScrollView = {
@@ -172,7 +182,10 @@ public final class DocCollectionViewController: NSViewController {
             collectionView.collectionViewLayout?.invalidateLayout()
         }
 
-        // Step 3: Scroll tracking
+        // Step 3: Initial scroll position (once)
+        applyInitialScrollIfNeeded()
+
+        // Step 4: Scroll tracking
         handleScrollTrackingAfterUpdate()
     }
 
@@ -183,6 +196,16 @@ public final class DocCollectionViewController: NSViewController {
             snapshot.appendItems(section.blocks.map(\.id), toSection: section.id)
         }
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+
+    // MARK: - Initial Scroll Position
+
+    private func applyInitialScrollIfNeeded() {
+        guard !hasAppliedInitialScroll, !document.sections.isEmpty else { return }
+        hasAppliedInitialScroll = true
+        if initialScrollPosition == .bottom {
+            scrollToBottom(animated: false)
+        }
     }
 
     // MARK: - Scroll Tracking (macOS)
@@ -281,8 +304,12 @@ public final class DocCollectionViewController: UIViewController, UICollectionVi
         }
     }
 
+    /// Where to scroll when the first non-empty document is set.
+    public var initialScrollPosition: InitialScrollPosition = .top
+
     private var isUserScrolledAway: Bool = false
     private var previousContentHeight: CGFloat = 0
+    private var hasAppliedInitialScroll: Bool = false
 
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: docLayout)
@@ -346,7 +373,10 @@ public final class DocCollectionViewController: UIViewController, UICollectionVi
             collectionView.collectionViewLayout.invalidateLayout()
         }
 
-        // Step 3: Scroll tracking
+        // Step 3: Initial scroll position (once)
+        applyInitialScrollIfNeeded()
+
+        // Step 4: Scroll tracking
         handleScrollTrackingAfterUpdate()
     }
 
@@ -357,6 +387,16 @@ public final class DocCollectionViewController: UIViewController, UICollectionVi
             snapshot.appendItems(section.blocks.map(\.id), toSection: section.id)
         }
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+
+    // MARK: - Initial Scroll Position
+
+    private func applyInitialScrollIfNeeded() {
+        guard !hasAppliedInitialScroll, !document.sections.isEmpty else { return }
+        hasAppliedInitialScroll = true
+        if initialScrollPosition == .bottom {
+            scrollToBottom(animated: false)
+        }
     }
 
     // MARK: - Scroll Tracking (iOS)
