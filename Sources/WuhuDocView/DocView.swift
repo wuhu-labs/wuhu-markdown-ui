@@ -16,6 +16,10 @@ import SwiftUI
 ///         return nil  // fall back to built-in views
 ///     }
 /// }
+///
+/// // With scroll tracking for streaming:
+/// DocView(document: streamingDocument)
+///     .trackingTail(isStreaming)
 /// ```
 
 #if canImport(AppKit)
@@ -24,6 +28,8 @@ import AppKit
 public struct DocView: NSViewControllerRepresentable {
     public var document: Document
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
+
+    var scrollTracking: ScrollTracking = .manual
 
     @Environment(\.openURL) private var openURL
 
@@ -35,10 +41,18 @@ public struct DocView: NSViewControllerRepresentable {
         self.customBlockView = customBlockView
     }
 
+    /// Enable or disable auto-scroll-to-bottom behavior.
+    public func trackingTail(_ enabled: Bool) -> DocView {
+        var copy = self
+        copy.scrollTracking = enabled ? .trackTail : .manual
+        return copy
+    }
+
     public func makeNSViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
         controller.onOpenURL = { openURL($0) }
+        controller.scrollTracking = scrollTracking
         return controller
     }
 
@@ -48,6 +62,7 @@ public struct DocView: NSViewControllerRepresentable {
     ) {
         controller.customBlockView = customBlockView
         controller.onOpenURL = { [openURL] in openURL($0) }
+        controller.scrollTracking = scrollTracking
         controller.setDocument(document)
     }
 }
@@ -59,6 +74,8 @@ public struct DocView: UIViewControllerRepresentable {
     public var document: Document
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
 
+    var scrollTracking: ScrollTracking = .manual
+
     @Environment(\.openURL) private var openURL
 
     public init(
@@ -69,10 +86,18 @@ public struct DocView: UIViewControllerRepresentable {
         self.customBlockView = customBlockView
     }
 
+    /// Enable or disable auto-scroll-to-bottom behavior.
+    public func trackingTail(_ enabled: Bool) -> DocView {
+        var copy = self
+        copy.scrollTracking = enabled ? .trackTail : .manual
+        return copy
+    }
+
     public func makeUIViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
         controller.onOpenURL = { openURL($0) }
+        controller.scrollTracking = scrollTracking
         return controller
     }
 
@@ -82,6 +107,7 @@ public struct DocView: UIViewControllerRepresentable {
     ) {
         controller.customBlockView = customBlockView
         controller.onOpenURL = { [openURL] in openURL($0) }
+        controller.scrollTracking = scrollTracking
         controller.setDocument(document)
     }
 }

@@ -1,5 +1,49 @@
 import SwiftUI
 
+// MARK: - ScrollTracking
+
+public enum ScrollTracking: Sendable {
+    case manual     // no auto-scrolling
+    case trackTail  // auto-scroll to bottom when content grows
+}
+
+// MARK: - Content Diffing
+
+/// Compares two documents and returns the `BlockID`s of blocks whose content
+/// changed (same identity, different value). Pure function — easy to test.
+public func contentChangedBlockIDs(
+    old: Document, new: Document
+) -> [BlockID] {
+    var changed: [BlockID] = []
+
+    // Build a lookup of old sections by ID for efficient matching
+    let oldSections: [String: DocSection] = Dictionary(
+        old.sections.map { ($0.id, $0) },
+        uniquingKeysWith: { first, _ in first }
+    )
+
+    for newSection in new.sections {
+        guard let oldSection = oldSections[newSection.id] else {
+            // Entirely new section — handled by snapshot insert, not reconfigure
+            continue
+        }
+
+        // Build lookup of old blocks by BlockID within this section
+        let oldBlocks: [BlockID: FlatBlock] = Dictionary(
+            oldSection.blocks.map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
+        for newBlock in newSection.blocks {
+            if let oldBlock = oldBlocks[newBlock.id], oldBlock != newBlock {
+                changed.append(newBlock.id)
+            }
+        }
+    }
+
+    return changed
+}
+
 // MARK: - macOS
 #if canImport(AppKit)
 import AppKit
@@ -17,6 +61,21 @@ public final class DocCollectionViewController: NSViewController {
 
     /// Called when the user clicks a link in a text block.
     public var onOpenURL: ((URL) -> Void)?
+
+    // MARK: - Scroll Tracking
+
+    public var scrollTracking: ScrollTracking = .manual {
+        didSet {
+            if scrollTracking == .trackTail {
+                isUserScrolledAway = false
+                scrollToBottom(animated: false)
+            }
+        }
+    }
+
+    private var isUserScrolledAway: Bool = false
+    private var previousContentHeight: CGFloat = 0
+    private nonisolated(unsafe) var scrollObserver: NSObjectProtocol?
 
     private lazy var scrollView: NSScrollView = {
         let sv = NSScrollView()
@@ -65,6 +124,24 @@ public final class DocCollectionViewController: NSViewController {
         ) { [weak self] cv, ip, _ in self?.makeItem(cv: cv, indexPath: ip) ?? NSCollectionViewItem() }
 
         syncCustomBlockView()
+
+        // Observe scroll position for user-scroll-away detection
+        scrollView.contentView.postsBoundsChangedNotifications = true
+        scrollObserver = NotificationCenter.default.addObserver(
+            forName: NSView.boundsDidChangeNotification,
+            object: scrollView.contentView,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.handleScrollChanged()
+            }
+        }
+    }
+
+    deinit {
+        if let observer = scrollObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     private func syncCustomBlockView() {
@@ -73,9 +150,30 @@ public final class DocCollectionViewController: NSViewController {
         )
     }
 
+    // MARK: - Set Document (Content-Aware Diff)
+
     public func setDocument(_ doc: Document) {
+        guard doc != self.document else { return }
+
+        let old = self.document
         self.document = doc
+
+        // Step 1: Identity diff (inserts/deletes/moves)
         applySnapshot()
+
+        // Step 2: Content diff (reload cells whose content changed)
+        let changed = contentChangedBlockIDs(old: old, new: doc)
+        if !changed.isEmpty {
+            var snapshot = dataSource.snapshot()
+            // AppKit's NSDiffableDataSourceSnapshot doesn't have
+            // reconfigureItems; use reloadItems instead.
+            snapshot.reloadItems(changed)
+            dataSource.apply(snapshot, animatingDifferences: false)
+            collectionView.collectionViewLayout?.invalidateLayout()
+        }
+
+        // Step 3: Scroll tracking
+        handleScrollTrackingAfterUpdate()
     }
 
     private func applySnapshot() {
@@ -86,6 +184,44 @@ public final class DocCollectionViewController: NSViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+
+    // MARK: - Scroll Tracking (macOS)
+
+    private func handleScrollTrackingAfterUpdate() {
+        guard scrollTracking == .trackTail else { return }
+
+        let newContentHeight = scrollView.documentView?.frame.height ?? 0
+        defer { previousContentHeight = newContentHeight }
+
+        guard newContentHeight > previousContentHeight, !isUserScrolledAway else { return }
+        scrollToBottom(animated: false)
+    }
+
+    private func scrollToBottom(animated: Bool) {
+        guard let documentView = scrollView.documentView else { return }
+        let maxY = max(documentView.frame.height - scrollView.contentView.bounds.height, 0)
+        let targetPoint = NSPoint(x: 0, y: maxY)
+        if animated {
+            scrollView.contentView.animator().setBoundsOrigin(targetPoint)
+        } else {
+            scrollView.contentView.scroll(to: targetPoint)
+        }
+        scrollView.reflectScrolledClipView(scrollView.contentView)
+    }
+
+    private var isNearBottom: Bool {
+        guard let documentView = scrollView.documentView else { return true }
+        let visibleMaxY = scrollView.contentView.bounds.origin.y + scrollView.contentView.bounds.height
+        let contentMaxY = documentView.frame.height
+        return contentMaxY - visibleMaxY < 50
+    }
+
+    private func handleScrollChanged() {
+        guard scrollTracking == .trackTail else { return }
+        isUserScrolledAway = !isNearBottom
+    }
+
+    // MARK: - Cell Factory
 
     private func makeItem(cv: NSCollectionView, indexPath: IndexPath) -> NSCollectionViewItem {
         let block = document.sections[indexPath.section].blocks[indexPath.item]
@@ -120,7 +256,7 @@ public final class DocCollectionViewController: NSViewController {
 #elseif canImport(UIKit)
 import UIKit
 
-public final class DocCollectionViewController: UIViewController {
+public final class DocCollectionViewController: UIViewController, UICollectionViewDelegate {
 
     private(set) var document: Document = Document(sections: [])
 
@@ -134,9 +270,24 @@ public final class DocCollectionViewController: UIViewController {
     /// Called when the user taps a link in a text block.
     public var onOpenURL: ((URL) -> Void)?
 
+    // MARK: - Scroll Tracking
+
+    public var scrollTracking: ScrollTracking = .manual {
+        didSet {
+            if scrollTracking == .trackTail {
+                isUserScrolledAway = false
+                scrollToBottom(animated: false)
+            }
+        }
+    }
+
+    private var isUserScrolledAway: Bool = false
+    private var previousContentHeight: CGFloat = 0
+
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: docLayout)
         cv.backgroundColor = .systemBackground
+        cv.delegate = self
         return cv
     }()
 
@@ -175,9 +326,28 @@ public final class DocCollectionViewController: UIViewController {
         )
     }
 
+    // MARK: - Set Document (Content-Aware Diff)
+
     public func setDocument(_ doc: Document) {
+        guard doc != self.document else { return }
+
+        let old = self.document
         self.document = doc
+
+        // Step 1: Identity diff (inserts/deletes/moves)
         applySnapshot()
+
+        // Step 2: Content diff (reconfigure cells whose content changed)
+        let changed = contentChangedBlockIDs(old: old, new: doc)
+        if !changed.isEmpty {
+            var snapshot = dataSource.snapshot()
+            snapshot.reconfigureItems(changed)
+            dataSource.apply(snapshot, animatingDifferences: false)
+            collectionView.collectionViewLayout.invalidateLayout()
+        }
+
+        // Step 3: Scroll tracking
+        handleScrollTrackingAfterUpdate()
     }
 
     private func applySnapshot() {
@@ -188,6 +358,42 @@ public final class DocCollectionViewController: UIViewController {
         }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+
+    // MARK: - Scroll Tracking (iOS)
+
+    private func handleScrollTrackingAfterUpdate() {
+        guard scrollTracking == .trackTail else { return }
+
+        let newContentHeight = collectionView.contentSize.height
+        defer { previousContentHeight = newContentHeight }
+
+        guard newContentHeight > previousContentHeight, !isUserScrolledAway else { return }
+        scrollToBottom(animated: false)
+    }
+
+    private func scrollToBottom(animated: Bool) {
+        let contentHeight = collectionView.contentSize.height
+        let viewHeight = collectionView.bounds.height
+        let insetBottom = collectionView.adjustedContentInset.bottom
+        let maxY = max(contentHeight - viewHeight + insetBottom, 0)
+        collectionView.setContentOffset(CGPoint(x: 0, y: maxY), animated: animated)
+    }
+
+    private var isNearBottom: Bool {
+        let contentHeight = collectionView.contentSize.height
+        let viewHeight = collectionView.bounds.height
+        let insetBottom = collectionView.adjustedContentInset.bottom
+        let offsetY = collectionView.contentOffset.y
+        let maxY = contentHeight - viewHeight + insetBottom
+        return maxY - offsetY < 50
+    }
+
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollTracking == .trackTail else { return }
+        isUserScrolledAway = !isNearBottom
+    }
+
+    // MARK: - Cell Factory
 
     private func makeCell(cv: UICollectionView, indexPath: IndexPath) -> UICollectionViewCell {
         let block = document.sections[indexPath.section].blocks[indexPath.item]

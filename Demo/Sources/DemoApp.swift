@@ -14,9 +14,10 @@ struct DemoApp: App {
 }
 
 struct ContentView: View {
-    @State private var selectedDoc: DocChoice? = .infinite
+    @State private var selectedDoc: DocChoice? = .streaming
 
     enum DocChoice: String, CaseIterable, Identifiable {
+        case streaming = "Streaming Demo"
         case infinite = "Infinite Doc (All)"
         case architecture = "Architecture Decision"
         case flattening = "Flattening Strategy"
@@ -33,26 +34,25 @@ struct ContentView: View {
             }
             .navigationTitle("Documents")
         } detail: {
-            if let choice = selectedDoc {
-                DocView(document: document(for: choice))
-                    .id(choice)
-            } else {
+            switch selectedDoc {
+            case .streaming:
+                StreamingDemoView()
+            case .infinite:
+                DocView(document: SampleData.infiniteDoc)
+                    .id(DocChoice.infinite)
+            case .architecture:
+                DocView(document: Document(sections: [SampleData.architectureDecisionDoc]))
+                    .id(DocChoice.architecture)
+            case .flattening:
+                DocView(document: Document(sections: [SampleData.flatteningStrategyDoc]))
+                    .id(DocChoice.flattening)
+            case .chat:
+                DocView(document: Document(sections: [SampleData.chatSessionDemo]))
+                    .id(DocChoice.chat)
+            case nil:
                 Text("Select a document")
                     .foregroundStyle(.secondary)
             }
-        }
-    }
-
-    private func document(for choice: DocChoice) -> Document {
-        switch choice {
-        case .infinite:
-            return SampleData.infiniteDoc
-        case .architecture:
-            return Document(sections: [SampleData.architectureDecisionDoc])
-        case .flattening:
-            return Document(sections: [SampleData.flatteningStrategyDoc])
-        case .chat:
-            return Document(sections: [SampleData.chatSessionDemo])
         }
     }
 }
