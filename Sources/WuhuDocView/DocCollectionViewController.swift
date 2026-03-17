@@ -202,10 +202,24 @@ public final class DocCollectionViewController: NSViewController {
 
     private func applyInitialScrollIfNeeded() {
         guard !hasAppliedInitialScroll, !document.sections.isEmpty else { return }
+        // Defer until we have a real size — view may not be laid out yet
+        // when setDocument is first called from updateNSViewController.
+        guard scrollView.contentView.bounds.width > 0 else { return }
         hasAppliedInitialScroll = true
         if initialScrollPosition == .bottom {
-            scrollToBottom(animated: false)
+            // Dispatch async: the collection view layout needs a run loop
+            // cycle to compute the real content height after the snapshot
+            // is applied and the view gets its real frame.
+            DispatchQueue.main.async { [weak self] in
+                self?.scrollToBottom(animated: false)
+            }
         }
+    }
+
+    public override func viewDidLayout() {
+        super.viewDidLayout()
+        // Retry initial scroll now that we have a real size.
+        applyInitialScrollIfNeeded()
     }
 
     // MARK: - Scroll Tracking (macOS)
@@ -393,10 +407,19 @@ public final class DocCollectionViewController: UIViewController, UICollectionVi
 
     private func applyInitialScrollIfNeeded() {
         guard !hasAppliedInitialScroll, !document.sections.isEmpty else { return }
+        // Defer until we have a real size — view may not be laid out yet
+        // when setDocument is first called from updateUIViewController.
+        guard collectionView.bounds.width > 0 else { return }
         hasAppliedInitialScroll = true
         if initialScrollPosition == .bottom {
             scrollToBottom(animated: false)
         }
+    }
+
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Retry initial scroll now that we have a real size.
+        applyInitialScrollIfNeeded()
     }
 
     // MARK: - Scroll Tracking (iOS)
