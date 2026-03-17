@@ -20,6 +20,10 @@ import SwiftUI
 /// // With scroll tracking for streaming:
 /// DocView(document: streamingDocument)
 ///     .trackingTail(isStreaming)
+///
+/// // Start scrolled to the bottom (e.g. chat):
+/// DocView(document: chatDocument)
+///     .initialScrollPosition(.bottom)
 /// ```
 
 #if canImport(AppKit)
@@ -30,6 +34,7 @@ public struct DocView: NSViewControllerRepresentable {
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
 
     var scrollTracking: ScrollTracking = .manual
+    var initialPosition: InitialScrollPosition = .top
 
     @Environment(\.openURL) private var openURL
 
@@ -48,11 +53,19 @@ public struct DocView: NSViewControllerRepresentable {
         return copy
     }
 
+    /// Set where the scroll view should start on first appearance.
+    public func initialScrollPosition(_ position: InitialScrollPosition) -> DocView {
+        var copy = self
+        copy.initialPosition = position
+        return copy
+    }
+
     public func makeNSViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
         controller.onOpenURL = { openURL($0) }
         controller.scrollTracking = scrollTracking
+        controller.initialScrollPosition = initialPosition
         return controller
     }
 
@@ -63,6 +76,7 @@ public struct DocView: NSViewControllerRepresentable {
         controller.customBlockView = customBlockView
         controller.onOpenURL = { [openURL] in openURL($0) }
         controller.scrollTracking = scrollTracking
+        controller.initialScrollPosition = initialPosition
         controller.setDocument(document)
     }
 }
@@ -75,6 +89,7 @@ public struct DocView: UIViewControllerRepresentable {
     public var customBlockView: (@MainActor (FlatBlock) -> AnyView?)?
 
     var scrollTracking: ScrollTracking = .manual
+    var initialPosition: InitialScrollPosition = .top
 
     @Environment(\.openURL) private var openURL
 
@@ -93,11 +108,19 @@ public struct DocView: UIViewControllerRepresentable {
         return copy
     }
 
+    /// Set where the scroll view should start on first appearance.
+    public func initialScrollPosition(_ position: InitialScrollPosition) -> DocView {
+        var copy = self
+        copy.initialPosition = position
+        return copy
+    }
+
     public func makeUIViewController(context: Context) -> DocCollectionViewController {
         let controller = DocCollectionViewController()
         controller.customBlockView = customBlockView
         controller.onOpenURL = { openURL($0) }
         controller.scrollTracking = scrollTracking
+        controller.initialScrollPosition = initialPosition
         return controller
     }
 
@@ -108,6 +131,7 @@ public struct DocView: UIViewControllerRepresentable {
         controller.customBlockView = customBlockView
         controller.onOpenURL = { [openURL] in openURL($0) }
         controller.scrollTracking = scrollTracking
+        controller.initialScrollPosition = initialPosition
         controller.setDocument(document)
     }
 }
