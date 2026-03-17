@@ -25,6 +25,15 @@ public final class DocViewLayout: NSCollectionViewLayout {
     private var contentHeight: CGFloat = 0
     private var contentWidth: CGFloat = 0
 
+    // MARK: - Height Cache
+
+    private struct HeightCacheKey: Hashable {
+        var block: FlatBlock
+        var width: CGFloat
+    }
+
+    private var heightCache: [HeightCacheKey: CGFloat] = [:]
+
     // MARK: - Layout Core
 
     public override func prepare() {
@@ -36,7 +45,14 @@ public final class DocViewLayout: NSCollectionViewLayout {
             return
         }
 
-        contentWidth = collectionView.bounds.width
+        let newWidth = collectionView.bounds.width
+
+        // Invalidate height cache when width changes
+        if newWidth != contentWidth {
+            heightCache.removeAll()
+        }
+
+        contentWidth = newWidth
         let availableWidth = contentWidth
         var y: CGFloat = registry.contentInsets  // top padding
 
@@ -53,11 +69,19 @@ public final class DocViewLayout: NSCollectionViewLayout {
                     y += spacingTable.spacing(prevKind, block.kind)
                 }
 
-                let height = registry.measureHeight(
-                    of: block,
-                    availableWidth: availableWidth,
-                    resolvedAttributes: resolvedAttributes
-                )
+                let cacheKey = HeightCacheKey(block: block, width: availableWidth)
+                let height: CGFloat
+                if let cached = heightCache[cacheKey] {
+                    height = cached
+                } else {
+                    height = registry.measureHeight(
+                        of: block,
+                        availableWidth: availableWidth,
+                        resolvedAttributes: resolvedAttributes
+                    )
+                    heightCache[cacheKey] = height
+                }
+
                 let leadingX = registry.leadingOffset(for: block)
                 let blockWidth = registry.contentWidth(
                     for: block, availableWidth: availableWidth
@@ -116,7 +140,7 @@ public final class DocViewLayout: NSCollectionViewLayout {
 #elseif canImport(UIKit)
 import UIKit
 
-/// Custom `UICollectionViewLayout` ��� same logic as the AppKit version.
+/// Custom `UICollectionViewLayout` — same logic as the AppKit version.
 public final class DocViewLayout: UICollectionViewLayout {
 
     public var spacingTable: SpacingTable = .default
@@ -128,6 +152,17 @@ public final class DocViewLayout: UICollectionViewLayout {
     private var contentHeight: CGFloat = 0
     private var contentWidth: CGFloat = 0
 
+    // MARK: - Height Cache
+
+    private struct HeightCacheKey: Hashable {
+        var block: FlatBlock
+        var width: CGFloat
+    }
+
+    private var heightCache: [HeightCacheKey: CGFloat] = [:]
+
+    // MARK: - Layout Core
+
     public override func prepare() {
         super.prepare()
         cachedAttributes.removeAll()
@@ -137,7 +172,14 @@ public final class DocViewLayout: UICollectionViewLayout {
             return
         }
 
-        contentWidth = collectionView.bounds.width
+        let newWidth = collectionView.bounds.width
+
+        // Invalidate height cache when width changes
+        if newWidth != contentWidth {
+            heightCache.removeAll()
+        }
+
+        contentWidth = newWidth
         let availableWidth = contentWidth
         var y: CGFloat = registry.contentInsets
 
@@ -152,11 +194,19 @@ public final class DocViewLayout: UICollectionViewLayout {
                     y += spacingTable.spacing(prevKind, block.kind)
                 }
 
-                let height = registry.measureHeight(
-                    of: block,
-                    availableWidth: availableWidth,
-                    resolvedAttributes: resolvedAttributes
-                )
+                let cacheKey = HeightCacheKey(block: block, width: availableWidth)
+                let height: CGFloat
+                if let cached = heightCache[cacheKey] {
+                    height = cached
+                } else {
+                    height = registry.measureHeight(
+                        of: block,
+                        availableWidth: availableWidth,
+                        resolvedAttributes: resolvedAttributes
+                    )
+                    heightCache[cacheKey] = height
+                }
+
                 let leadingX = registry.leadingOffset(for: block)
                 let blockWidth = registry.contentWidth(
                     for: block, availableWidth: availableWidth

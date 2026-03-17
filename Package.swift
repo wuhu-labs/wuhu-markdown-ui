@@ -10,5 +10,9 @@ let package = Package(
     ],
     targets: [
         .target(name: "WuhuDocView"),
+        .testTarget(
+            name: "WuhuDocViewTests",
+            dependencies: ["WuhuDocView"]
+        ),
     ]
 )
