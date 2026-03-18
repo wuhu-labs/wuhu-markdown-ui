@@ -53,7 +53,7 @@ extension ViewBasedBlockMeasuring {
         return ceil(hosting.fittingSize.height)
         #elseif canImport(UIKit)
         let hc = UIHostingController(rootView: swiftUIView)
-        let size = hc.sizeThatFits(in: CGSize(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude))
+        let size = hc.sizeThatFits(in: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
         return ceil(size.height)
         #endif
     }
