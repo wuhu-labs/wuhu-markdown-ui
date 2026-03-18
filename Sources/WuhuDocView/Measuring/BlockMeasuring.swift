@@ -47,14 +47,13 @@ extension ViewBasedBlockMeasuring {
 
     /// Instantiate a temporary hosting view, measure, discard.
     public static func measureHostingView(_ swiftUIView: AnyView, width: CGFloat) -> CGFloat {
+        let constrained = AnyView(swiftUIView.frame(width: width))
         #if canImport(AppKit)
-        let hosting = NSHostingView(rootView: swiftUIView)
-        hosting.frame.size.width = width
-        hosting.layoutSubtreeIfNeeded()
+        let hosting = NSHostingView(rootView: constrained)
         return ceil(hosting.fittingSize.height)
         #elseif canImport(UIKit)
         let hc = UIHostingController(rootView: swiftUIView)
-        let size = hc.sizeThatFits(in: CGSize(width: width, height: .greatestFiniteMagnitude))
+        let size = hc.sizeThatFits(in: CGSize(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude))
         return ceil(size.height)
         #endif
     }
